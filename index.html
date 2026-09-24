@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Little Surprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Ambient background: gradient + soft particles, sits behind everything -->
+<div class="bg" aria-hidden="true">
+  <div class="bg-glow bg-glow--one"></div>
+  <div class="bg-glow bg-glow--two"></div>
+  <canvas id="particles"></canvas>
+</div>
+
+<!-- 1. LOADING SCREEN -->
+<section id="loading" class="screen loading-screen" aria-label="Loading">
+  <p class="loading-text">A little surprise is waiting for you&hellip;</p>
+  <div class="loading-dots" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+</section>
+
+<!-- 2. BIRTHDAY CARD -->
+<section id="card-screen" class="screen card-screen" aria-label="Birthday card" hidden>
+  <div class="card">
+    <div class="card__glow" aria-hidden="true"></div>
+    <p class="card__eyebrow">Happy Birthday</p>
+    <h1 class="card__name">Happy Birthday, <span id="birthdayName">Friend</span></h1>
+    <p class="card__greeting" id="typewriterGreeting" aria-live="polite"></p>
+
+    <div class="card__photo-wrap" aria-label="Birthday photo">
+      <img class="card__photo" src="images/photo8.jpg" alt="Birthday photo" />
+    </div>
+
+    <button id="openSurpriseBtn" class="btn btn--primary" type="button">
+      <span>Open Your Surprise</span>
+      <span class="btn__icon" aria-hidden="true">&#127873;</span>
+    </button>
+  </div>
+</section>
+
+<!-- 3. PHOTO MEMORY EXPERIENCE -->
+<section id="slideshow-screen" class="screen slideshow-screen" aria-label="Photo memories" hidden>
+  <div class="slideshow">
+    <div id="photoStage" class="photo-stage"></div>
+    <div class="slideshow-progress">
+      <span id="progressCount" class="progress-count">01 / 01</span>
+      <div class="progress-track" aria-hidden="true">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. FINAL MESSAGE -->
+<section id="final-screen" class="screen final-screen" aria-label="Final message" hidden>
+  <div class="final-card">
+    <p id="finalMessage" class="final-message" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 5. FINAL SURPRISE / CONFETTI SCREEN -->
+<section id="ending-screen" class="screen ending-screen" aria-label="Closing" hidden>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div class="floating-symbols" id="floatingSymbols" aria-hidden="true"></div>
+  <h2 class="ending-title">Once Again, Happy Birthday</h2>
+  <span class="ending-heart" aria-hidden="true">&#10084;</span>
+</section>
+
+<!-- MUSIC CONTROL — present throughout the experience -->
+<button id="musicToggle" class="music-toggle" type="button" aria-label="Play birthday music" aria-pressed="false" hidden>
+  <span class="music-toggle__icon" aria-hidden="true">&#9835;</span>
+</button>
+<audio id="bgMusic" src="music/birthday-song.mp3" preload="none" loop></audio>
+
+<script src="script.js"></script>
+</body>
+</html>

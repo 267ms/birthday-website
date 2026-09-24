@@ -1,0 +1,604 @@
+/* =====================================================
+   DESIGN TOKENS
+   Change these to restyle the whole site from one place.
+   ===================================================== */
+:root {
+  /* Warm + Light Cutesy Theme */
+  --ink: #5b4650;
+  --ink-soft: rgba(91, 70, 80, 0.72);
+
+  --bg-deep: #fff8f3;
+  --bg-mid: #fff0e8;
+
+  --accent: #e99a8f;
+  --accent-soft: #f6b8ad;
+
+  --rose: #d9878d;
+
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(217, 135, 141, 0.25);
+
+  --shadow-soft: 0 25px 55px -20px rgba(153, 103, 94, 0.22);
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Outfit', sans-serif;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-slow: 900ms;
+  --dur-med: 550ms;
+  --dur-fast: 280ms;
+}
+
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background: var(--bg-deep);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100dvh;
+  position: relative;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* =====================================================
+   AMBIENT BACKGROUND
+   ===================================================== */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      100% 80% at 10% 10%,
+      #ffe1dc 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      100% 80% at 90% 90%,
+      #ffe9c9 0%,
+      transparent 55%
+    ),
+    linear-gradient(
+      145deg,
+      #fffaf7,
+      #fff1ec 55%,
+      #fff8ef
+    );
+
+  background-size: 200% 200%;
+  animation: bgDrift 22s ease-in-out infinite alternate;
+}
+
+@keyframes bgDrift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+.bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+}
+.bg-glow--one {
+  
+  background: radial-gradient(circle, var(--accent), transparent 70%);
+}
+.bg-glow--two {
+  width: 36vmax; height: 36vmax;
+  bottom: -12vmax; left: -8vmax;
+  background: radial-gradient(circle, var(--rose), transparent 70%);
+  animation: floatGlow 18s ease-in-out infinite reverse;
+}
+@keyframes floatGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(3vmax, -2vmax) scale(1.08); }
+}
+
+#particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* =====================================================
+   SCREENS — shared layout
+   ===================================================== */
+.screen {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 6vh 5vw;
+  transition: opacity var(--dur-slow) var(--ease-soft), filter var(--dur-slow) var(--ease-soft);
+}
+
+.screen[hidden] { display: none; }
+
+.screen--leaving {
+  opacity: 0;
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.screen--entering {
+  animation: screenEnter var(--dur-slow) var(--ease-soft) both;
+}
+@keyframes screenEnter {
+  from { opacity: 0; filter: blur(10px); transform: scale(0.98); }
+  to   { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+/* =====================================================
+   1. LOADING SCREEN
+   ===================================================== */
+.loading-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  margin: 0 0 2rem;
+  opacity: 0;
+  animation: fadeUp var(--dur-slow) var(--ease-soft) 200ms forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.loading-dots {
+  display: flex;
+  gap: 0.6rem;
+}
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1); opacity: 1; }
+}
+
+/* =====================================================
+   2. BIRTHDAY CARD
+   ===================================================== */
+.card {
+  position: relative;
+  width: min(92vw, 460px);
+  padding: clamp(2.2rem, 5vw, 3.2rem) clamp(1.6rem, 5vw, 2.6rem);
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(217, 135, 141, 0.25);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: 0 25px 60px rgba(190, 120, 110, 0.18);
+
+  animation: cardFloat 6s ease-in-out infinite;
+}
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+.card__glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--accent-soft), transparent 40%, var(--rose) 100%);
+  opacity: 0.5;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.card__eyebrow {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  color: var(--rose);
+  text-transform: lowercase;
+}
+
+.card__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  line-height: 1.15;
+  margin: 0 0 1rem;
+  color: var(--ink);
+}
+.card__name span {
+  color: #df8f91;
+}
+
+.card__greeting {
+  min-height: 3.2em;
+  font-size: clamp(0.98rem, 2.6vw, 1.08rem);
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 0 0 1.2rem;
+}
+
+.card__photo-wrap {
+  width: min(100%, 260px);
+  margin: 0 auto 1.6rem;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(217, 135, 141, 0.25);
+  box-shadow: 0 18px 32px rgba(190, 120, 110, 0.16);
+}
+
+.card__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.card__greeting .cursor {
+  display: inline-block;
+  width: 1px;
+  margin-left: 2px;
+  background: var(--accent-soft);
+  animation: blink 0.9s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Buttons */
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.95rem 2.1rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: transform var(--dur-fast) var(--ease-soft),
+              box-shadow var(--dur-fast) var(--ease-soft);
+}
+.btn--primary {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f5aaa2,
+      #e98f91
+    );
+
+  box-shadow:
+    0 12px 30px -10px rgba(233, 143, 145, 0.45);
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px) scale(1.03);
+
+  box-shadow:
+    0 16px 36px -8px rgba(233, 143, 145, 0.55);
+}
+.btn--primary:active { transform: translateY(0) scale(0.98); }
+.btn:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 3px;
+}
+.btn__icon {
+  display: inline-block;
+  transition: transform var(--dur-fast) var(--ease-soft);
+}
+.btn--primary:hover .btn__icon { transform: rotate(-12deg) scale(1.1); }
+
+/* =====================================================
+   3. PHOTO SLIDESHOW
+   ===================================================== */
+.slideshow {
+  width: min(94vw, 480px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.photo-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 24px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(217, 135, 141, 0.25);
+
+  box-shadow: 0 25px 55px rgba(153, 103, 94, 0.20);
+}
+
+/* Each photo is a wrapper (handles the entrance animation) around
+   an img (handles the continuous Ken Burns zoom). Splitting them
+   into two elements lets both animations run at once without
+   fighting over the same `transform` property. */
+.photo-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.photo-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform, opacity, filter;
+}
+
+.slideshow-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.progress-count {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.progress-track {
+  width: min(60%, 220px);
+  height: 3px;
+  border-radius: 999px;
+  background: var(--glass-border);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--rose), var(--accent-soft));
+  transition: width var(--dur-fast) linear;
+}
+
+/* Photo entrance animation classes — applied one at a time via JS */
+.anim-in {
+  animation-duration: var(--dur-med);
+  animation-timing-function: var(--ease-soft);
+  animation-fill-mode: both;
+}
+@keyframes slideLeft   { from { opacity: 0; transform: translateX(-6%) scale(1.02); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes slideRight  { from { opacity: 0; transform: translateX(6%) scale(1.02); }  to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes slideTop    { from { opacity: 0; transform: translateY(-6%) scale(1.02); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes slideBottom { from { opacity: 0; transform: translateY(6%) scale(1.02); }  to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes diagonalIn  { from { opacity: 0; transform: translate(-4%, 4%) scale(1.03) rotate(-2deg); } to { opacity: 1; transform: translate(0,0) scale(1) rotate(0); } }
+@keyframes rotateFade  { from { opacity: 0; transform: rotate(-3deg) scale(1.02); } to { opacity: 1; transform: rotate(0) scale(1); } }
+@keyframes scaleUp     { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes scaleDown   { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: scale(1); } }
+@keyframes blurIn      { from { opacity: 0; filter: blur(14px); transform: scale(1.03); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+
+.anim-slideLeft   { animation-name: slideLeft; }
+.anim-slideRight  { animation-name: slideRight; }
+.anim-slideTop    { animation-name: slideTop; }
+.anim-slideBottom { animation-name: slideBottom; }
+.anim-diagonalIn  { animation-name: diagonalIn; }
+.anim-rotateFade  { animation-name: rotateFade; }
+.anim-scaleUp     { animation-name: scaleUp; }
+.anim-scaleDown   { animation-name: scaleDown; }
+.anim-blurIn      { animation-name: blurIn; }
+
+.photo-leaving {
+  animation: photoLeave var(--dur-fast) var(--ease-soft) both;
+}
+@keyframes photoLeave {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Ken Burns zoom, layered on the image itself over its full display time */
+.kb-in  { animation: kbIn linear both; }
+.kb-out { animation: kbOut linear both; }
+@keyframes kbIn  { from { transform: scale(1); }    to { transform: scale(1.12); } }
+@keyframes kbOut { from { transform: scale(1.12); } to { transform: scale(1); } }
+
+/* =====================================================
+   4. FINAL MESSAGE
+   ===================================================== */
+.final-card {
+  width: min(90vw, 480px);
+  padding: clamp(2rem, 6vw, 3rem);
+  border-radius: 26px;
+
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(217, 135, 141, 0.25);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow: 0 25px 55px rgba(153, 103, 94, 0.18);
+}
+.final-message {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  margin: 0;
+}
+.final-message .cursor {
+  display: inline-block;
+  width: 2px;
+  margin-left: 2px;
+  background: var(--accent-soft);
+  animation: blink 0.9s steps(1) infinite;
+}
+
+.final-screen {
+  background:
+    radial-gradient(
+      80% 60% at 50% 40%,
+      rgba(255, 210, 205, 0.35),
+      transparent 70%
+    );
+}
+/* =====================================================
+   5. ENDING / CONFETTI
+   ===================================================== */
+.ending-screen { overflow: hidden; }
+
+#confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.floating-symbols {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.floating-symbol {
+  position: absolute;
+  bottom: -10%;
+  font-size: 1.2rem;
+  opacity: 0.8;
+  animation: floatUp linear forwards;
+}
+@keyframes floatUp {
+  to { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+}
+
+.ending-title {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  margin: 0 0 0.6rem;
+  text-shadow: 0 0 24px rgba(227, 167, 92, 0.5);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 18px rgba(227, 167, 92, 0.35); }
+  50%      { text-shadow: 0 0 34px rgba(227, 167, 92, 0.65); }
+}
+.ending-heart {
+  position: relative;
+  z-index: 2;
+  color: var(--rose);
+  font-size: 1.4rem;
+  animation: heartBeat 1.8s ease-in-out infinite;
+}
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
+}
+
+/* =====================================================
+   MUSIC TOGGLE
+   ===================================================== */
+.music-toggle {
+  position: fixed;
+  top: max(1.2rem, env(safe-area-inset-top));
+  right: 1.2rem;
+  z-index: 10;
+
+  width: 46px;
+  height: 46px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(217, 135, 141, 0.25);
+
+  background: rgba(255, 255, 255, 0.75);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #d9878d;
+  font-size: 1.1rem;
+
+  box-shadow: 0 8px 25px rgba(153, 103, 94, 0.12);
+
+  transition:
+    transform var(--dur-fast) var(--ease-soft),
+    background var(--dur-fast);
+}
+.music-toggle:hover { transform: scale(1.08); }
+.music-toggle[aria-pressed="true"] {
+  color: var(--accent-soft);
+  animation: musicSpin 6s linear infinite;
+}
+@keyframes musicSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.music-toggle:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 3px;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 420px) {
+  .card { padding: 2rem 1.4rem; }
+  .btn { padding: 0.85rem 1.7rem; font-size: 0.92rem; }
+}
+
+@media (min-width: 760px) {
+  .photo-stage { aspect-ratio: 16 / 10; }
+  .slideshow { width: min(80vw, 720px); }
+}
+
+/* =====================================================
+   REDUCED MOTION
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .bg, .card, .bg-glow { animation: none !important; }
+}
