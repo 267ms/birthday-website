@@ -334,9 +334,6 @@ button {
   gap: 1.4rem;
 }
 
-.slideshow.is-ready{
-   opacity: 1;
-}
 .photo-stage {
   position: relative;
   width: 100%;
