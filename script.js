@@ -12,11 +12,11 @@ const cardGreeting = "I made you something small, just for today.";
 
 // How long each photo stays on screen, in milliseconds.
 // 1000 = 1 second.
-const PHOTO_DURATION = 500;
+const PHOTO_DURATION = 4000;
 
 // How long the fade/slide between photos takes, in milliseconds.
 // Keep this shorter than PHOTO_DURATION.
-const TRANSITION_DURATION = 400;
+const TRANSITION_DURATION = 800;
 
 // The final birthday letter.
 const birthdayMessage = `Some people make ordinary moments feel special just by being in them.
