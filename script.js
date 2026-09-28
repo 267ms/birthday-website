@@ -11,10 +11,10 @@ const cardGreeting =
 
 // How long each photo stays on screen, in milliseconds.
 // 4000 = 4 seconds.
-const PHOTO_DURATION = 4000;
+const PHOTO_DURATION = 1500;
 
 // How long the transition between photos takes.
-const TRANSITION_DURATION = 800;
+const TRANSITION_DURATION = 700;
 
 // The final birthday letter.
 const birthdayMessage = `Some people make ordinary moments feel special just by being in them.
