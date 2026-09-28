@@ -241,7 +241,7 @@ document
   .addEventListener(
     "click",
     async () => {
-
+  startmusic();
 
       // IMPORTANT:
       // Load all photos before showing slideshow.
@@ -623,7 +623,7 @@ function startMusic() {
   }
 
 
-  bgMusic.volume = 0;
+  bgMusic.volume = 0.55;
 
 
   const playPromise =
@@ -1256,4 +1256,3 @@ initLoading();
 // ============================================================
 // MUSIC
 // ============================================================
-
