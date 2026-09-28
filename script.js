@@ -1,21 +1,19 @@
-
 // ============================================================
 // PERSONAL DETAILS — EDIT HERE
-// This is the only section most people need to touch.
 // ============================================================
 
 // The name that appears on the birthday card.
 const birthdayName = "Sneha";
 
 // The short line that types itself out under the name on the card.
-const cardGreeting = "I made you something small, just for today.";
+const cardGreeting =
+  "I made you something small, just for today.";
 
 // How long each photo stays on screen, in milliseconds.
-// 1000 = 1 second.
+// 4000 = 4 seconds.
 const PHOTO_DURATION = 4000;
 
-// How long the fade/slide between photos takes, in milliseconds.
-// Keep this shorter than PHOTO_DURATION.
+// How long the transition between photos takes.
 const TRANSITION_DURATION = 800;
 
 // The final birthday letter.
@@ -27,9 +25,9 @@ Here's to another year of your laugh, your ideas, and all the small chaos you br
 
 Happy Birthday. I hope today feels exactly like you deserve.`;
 
+
 // ============================================================
-// ADD YOUR PHOTOS HERE
-// Put files in the images/ folder and list them in order below.
+// PHOTOS
 // ============================================================
 
 const photos = [
@@ -41,6 +39,29 @@ const photos = [
   "images/photo6.jpg"
 ];
 
+
+// ============================================================
+// PRELOAD ALL PHOTOS
+// This prevents the white/blank screen between photos.
+// ============================================================
+
+function preloadPhotos() {
+  return Promise.all(
+    photos.map((src) => {
+      return new Promise((resolve) => {
+
+        const img = new Image();
+
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+
+        img.src = src;
+      });
+    })
+  );
+}
+
+
 // ============================================================
 // EVERYTHING BELOW THIS LINE RUNS THE EXPERIENCE.
 // ============================================================
@@ -48,6 +69,11 @@ const photos = [
 const prefersReducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
+
+
+// ============================================================
+// SCREEN ELEMENTS
+// ============================================================
 
 const screens = {
   loading: document.getElementById("loading"),
@@ -57,182 +83,364 @@ const screens = {
   ending: document.getElementById("ending-screen"),
 };
 
-/**
- * Swaps one full-screen section for another with a soft
- * fade + blur transition.
- */
+
+// ============================================================
+// SCREEN TRANSITION
+// ============================================================
+
 function showScreen(from, to) {
+
   return new Promise((resolve) => {
+
     const finish = () => {
+
       if (from) {
+
         from.hidden = true;
-        from.classList.remove("screen--leaving");
+
+        from.classList.remove(
+          "screen--leaving"
+        );
       }
 
       to.hidden = false;
-      to.classList.add("screen--entering");
 
-      setTimeout(() => {
-        to.classList.remove("screen--entering");
-        resolve();
-      }, prefersReducedMotion ? 0 : 800);
+      to.classList.add(
+        "screen--entering"
+      );
+
+      setTimeout(
+        () => {
+
+          to.classList.remove(
+            "screen--entering"
+          );
+
+          resolve();
+
+        },
+        prefersReducedMotion ? 0 : 800
+      );
     };
 
+
     if (from) {
-      from.classList.add("screen--leaving");
+
+      from.classList.add(
+        "screen--leaving"
+      );
 
       setTimeout(
         finish,
         prefersReducedMotion ? 0 : 400
       );
+
     } else {
+
       finish();
+
     }
+
   });
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // 1. LOADING SCREEN → BIRTHDAY CARD
-// ------------------------------------------------------------
+// ============================================================
 
-document.getElementById("birthdayName").textContent = birthdayName;
+document.getElementById(
+  "birthdayName"
+).textContent = birthdayName;
 
-async function typewrite(el, text, speed = 55) {
+
+async function typewrite(
+  el,
+  text,
+  speed = 55
+) {
+
   el.textContent = "";
 
-  const cursor = document.createElement("span");
+  const cursor =
+    document.createElement("span");
+
   cursor.className = "cursor";
+
   el.appendChild(cursor);
 
+
   for (const ch of text) {
-    cursor.insertAdjacentText("beforebegin", ch);
+
+    cursor.insertAdjacentText(
+      "beforebegin",
+      ch
+    );
+
 
     if (!prefersReducedMotion) {
-      await new Promise((r) => setTimeout(r, speed));
+
+      await new Promise(
+        (r) =>
+          setTimeout(
+            r,
+            speed
+          )
+      );
+
     }
+
   }
 
+
   cursor.remove();
+
 }
+
 
 function initLoading() {
-  const LOADING_DELAY = prefersReducedMotion ? 400 : 800;
 
-  setTimeout(async () => {
-    await showScreen(screens.loading, screens.card);
+  const LOADING_DELAY =
+    prefersReducedMotion
+      ? 400
+      : 800;
 
-    typewrite(
-      document.getElementById("typewriterGreeting"),
-      cardGreeting
-    );
-  }, LOADING_DELAY);
+
+  setTimeout(
+    async () => {
+
+      await showScreen(
+        screens.loading,
+        screens.card
+      );
+
+
+      typewrite(
+        document.getElementById(
+          "typewriterGreeting"
+        ),
+        cardGreeting
+      );
+
+    },
+    LOADING_DELAY
+  );
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // 2. BIRTHDAY CARD → SLIDESHOW
-// ------------------------------------------------------------
+// ============================================================
 
 document
-  .getElementById("openSurpriseBtn")
-  .addEventListener("click", async () => {
+  .getElementById(
+    "openSurpriseBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
 
-    // If browser blocked autoplay earlier,
-    // clicking this button will start the music.
-    startMusic();
+      // Start music after user interaction.
+      startMusic();
 
-    await showScreen(
-      screens.card,
-      screens.slideshow
-    );
 
-    runSlideshow();
-  });
+      // IMPORTANT:
+      // Load all photos before showing slideshow.
+      // This prevents blank/white photo screens.
+      await preloadPhotos();
 
-// ------------------------------------------------------------
+
+      // Now open slideshow.
+      await showScreen(
+        screens.card,
+        screens.slideshow
+      );
+
+
+      // Start slideshow.
+      runSlideshow();
+
+    }
+  );
+
+
+// ============================================================
 // 3. PHOTO SLIDESHOW
-// ------------------------------------------------------------
+// ============================================================
 
 const ENTRANCE_ANIMATIONS = [
+
   "anim-slideLeft",
+
   "anim-slideRight",
+
   "anim-slideTop",
+
   "anim-slideBottom",
+
   "anim-diagonalIn",
+
   "anim-rotateFade",
+
   "anim-scaleUp",
+
   "anim-scaleDown",
-  "anim-blurIn",
+
+  "anim-blurIn"
+
 ];
 
+
 function pickAnimation(lastAnim) {
+
   let choice = lastAnim;
 
+
   while (choice === lastAnim) {
+
     choice =
       ENTRANCE_ANIMATIONS[
         Math.floor(
-          Math.random() * ENTRANCE_ANIMATIONS.length
+          Math.random() *
+          ENTRANCE_ANIMATIONS.length
         )
       ];
+
   }
 
+
   return choice;
+
 }
 
+
+// ============================================================
+// SLIDESHOW ELEMENTS
+// ============================================================
+
 const photoStage =
-  document.getElementById("photoStage");
+  document.getElementById(
+    "photoStage"
+  );
+
 
 const progressCount =
-  document.getElementById("progressCount");
+  document.getElementById(
+    "progressCount"
+  );
+
 
 const progressFill =
-  document.getElementById("progressFill");
+  document.getElementById(
+    "progressFill"
+  );
+
+
+// ============================================================
+// RUN SLIDESHOW
+// ============================================================
 
 async function runSlideshow() {
 
-  const total = photos.length;
+  const total =
+    photos.length;
+
+
   let lastAnim = null;
 
-  for (let i = 0; i < total; i++) {
 
-    const src = photos[i];
+  for (
+    let i = 0;
+    i < total;
+    i++
+  ) {
 
-    // Wrapper handles the entrance animation.
-    const frame = document.createElement("div");
+    const src =
+      photos[i];
 
+
+    // --------------------------------------------------------
+    // CREATE PHOTO FRAME
+    // --------------------------------------------------------
+
+    const frame =
+      document.createElement(
+        "div"
+      );
+
+
+    // Choose animation.
     const entranceClass =
-      pickAnimation(lastAnim);
+      pickAnimation(
+        lastAnim
+      );
 
-    lastAnim = entranceClass;
 
-    frame.className = prefersReducedMotion
-      ? "photo-frame"
-      : `photo-frame anim-in ${entranceClass}`;
+    lastAnim =
+      entranceClass;
 
-    // Image
-    const img = document.createElement("img");
+
+    frame.className =
+      prefersReducedMotion
+        ? "photo-frame"
+        : `photo-frame anim-in ${entranceClass}`;
+
+
+    // --------------------------------------------------------
+    // CREATE IMAGE
+    // --------------------------------------------------------
+
+    const img =
+      document.createElement(
+        "img"
+      );
+
 
     img.src = src;
-    img.alt = `Memory photo ${i + 1} of ${total}`;
 
-    if (!prefersReducedMotion) {
+    img.alt =
+      `Memory photo ${i + 1} of ${total}`;
+
+
+    // --------------------------------------------------------
+    // KEN BURNS EFFECT
+    // --------------------------------------------------------
+
+    if (
+      !prefersReducedMotion
+    ) {
 
       const kbClass =
         i % 2 === 0
           ? "kb-in"
           : "kb-out";
 
-      img.className = kbClass;
+
+      img.className =
+        kbClass;
+
 
       img.style.animationDuration =
         `${PHOTO_DURATION + TRANSITION_DURATION}ms`;
+
     }
 
+
+    // Add image to frame.
     frame.appendChild(img);
 
-    // Remove previous photo.
+
+    // --------------------------------------------------------
+    // REMOVE PREVIOUS PHOTO
+    // --------------------------------------------------------
+
     const prevFrame =
-      photoStage.querySelector(".photo-frame");
+      photoStage.querySelector(
+        ".photo-frame"
+      );
+
 
     if (prevFrame) {
 
@@ -240,70 +448,131 @@ async function runSlideshow() {
         "photo-leaving"
       );
 
+
       setTimeout(
-        () => prevFrame.remove(),
+        () => {
+
+          if (
+            prevFrame.parentNode
+          ) {
+
+            prevFrame.remove();
+
+          }
+
+        },
         TRANSITION_DURATION
       );
+
     }
 
-    photoStage.appendChild(frame);
 
-    // Progress counter.
+    // --------------------------------------------------------
+    // SHOW NEW PHOTO
+    // --------------------------------------------------------
+
+    photoStage.appendChild(
+      frame
+    );
+
+
+    // --------------------------------------------------------
+    // UPDATE COUNTER
+    // --------------------------------------------------------
+
     progressCount.textContent =
       `${String(i + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
 
-    // Progress bar.
+
+    // --------------------------------------------------------
+    // UPDATE PROGRESS BAR
+    // --------------------------------------------------------
+
     progressFill.style.width =
       `${((i + 1) / total) * 100}%`;
 
+
+    // --------------------------------------------------------
+    // WAIT BEFORE NEXT PHOTO
+    // --------------------------------------------------------
+
     await new Promise(
-      (r) => setTimeout(r, PHOTO_DURATION)
+      (r) =>
+        setTimeout(
+          r,
+          PHOTO_DURATION
+        )
     );
+
   }
 
-  // Give final photo a little time.
+
+  // ----------------------------------------------------------
+  // KEEP FINAL PHOTO VISIBLE A LITTLE LONGER
+  // ----------------------------------------------------------
+
   await new Promise(
-    (r) => setTimeout(r, 400)
+    (r) =>
+      setTimeout(
+        r,
+        400
+      )
   );
 
+
+  // Move to final message.
   await transitionToFinal();
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // 4. SLIDESHOW → FINAL MESSAGE
-// ------------------------------------------------------------
+// ============================================================
 
 async function transitionToFinal() {
 
   const lastFrame =
-    photoStage.querySelector(".photo-frame");
+    photoStage.querySelector(
+      ".photo-frame"
+    );
+
 
   if (lastFrame) {
+
     lastFrame.classList.add(
       "photo-leaving"
     );
+
   }
+
 
   await showScreen(
     screens.slideshow,
     screens.final
   );
 
+
   await typewrite(
-    document.getElementById("finalMessage"),
+    document.getElementById(
+      "finalMessage"
+    ),
     birthdayMessage,
     30
   );
+
 
   setTimeout(
     transitionToEnding,
     1000
   );
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // 5. FINAL MESSAGE → CONFETTI ENDING
-// ------------------------------------------------------------
+// ============================================================
 
 async function transitionToEnding() {
 
@@ -312,37 +581,62 @@ async function transitionToEnding() {
     screens.ending
   );
 
+
   launchConfetti();
+
   launchFloatingSymbols();
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // MUSIC
-// ------------------------------------------------------------
+// ============================================================
 
 const bgMusic =
-  document.getElementById("bgMusic");
+  document.getElementById(
+    "bgMusic"
+  );
+
 
 const musicToggle =
-  document.getElementById("musicToggle");
+  document.getElementById(
+    "musicToggle"
+  );
+
 
 let musicStarted = false;
+
+
+// ============================================================
+// START MUSIC
+// ============================================================
 
 function startMusic() {
 
   // Show music button.
   musicToggle.hidden = false;
 
-  // If music is already playing, do nothing.
+
+  // If music is already playing,
+  // don't start it again.
   if (!bgMusic.paused) {
+
     return;
+
   }
+
 
   bgMusic.volume = 0;
 
-  const playPromise = bgMusic.play();
 
-  if (playPromise !== undefined) {
+  const playPromise =
+    bgMusic.play();
+
+
+  if (
+    playPromise !== undefined
+  ) {
 
     playPromise
       .then(() => {
@@ -354,22 +648,30 @@ function startMusic() {
       })
       .catch(() => {
 
-        // Browser may block autoplay.
-        // User can start music using the button.
         musicStarted = false;
+
 
         musicToggle.setAttribute(
           "aria-pressed",
           "false"
         );
 
+
         musicToggle.setAttribute(
           "aria-label",
           "Play birthday music"
         );
+
       });
+
   }
+
 }
+
+
+// ============================================================
+// FADE MUSIC IN
+// ============================================================
 
 function fadeMusicIn() {
 
@@ -378,35 +680,55 @@ function fadeMusicIn() {
     "true"
   );
 
+
   musicToggle.setAttribute(
     "aria-label",
     "Pause birthday music"
   );
 
+
   const target = 0.55;
+
   const step = 0.02;
 
-  const fade = setInterval(() => {
 
-    bgMusic.volume =
-      Math.min(
-        target,
-        bgMusic.volume + step
-      );
+  const fade =
+    setInterval(
+      () => {
 
-    if (bgMusic.volume >= target) {
-      clearInterval(fade);
-    }
+        bgMusic.volume =
+          Math.min(
+            target,
+            bgMusic.volume + step
+          );
 
-  }, 80);
+
+        if (
+          bgMusic.volume >= target
+        ) {
+
+          clearInterval(fade);
+
+        }
+
+      },
+      80
+    );
+
 }
 
-// Music button.
+
+// ============================================================
+// MUSIC BUTTON
+// ============================================================
+
 musicToggle.addEventListener(
   "click",
   () => {
 
-    if (bgMusic.paused) {
+    if (
+      bgMusic.paused
+    ) {
 
       startMusic();
 
@@ -414,35 +736,49 @@ musicToggle.addEventListener(
 
       bgMusic.pause();
 
+
       musicToggle.setAttribute(
         "aria-pressed",
         "false"
       );
 
+
       musicToggle.setAttribute(
         "aria-label",
         "Play birthday music"
       );
+
     }
+
   }
 );
 
-// ------------------------------------------------------------
+
+// ============================================================
 // BACKGROUND PARTICLES
-// ------------------------------------------------------------
+// ============================================================
 
 function initParticles() {
 
   const canvas =
-    document.getElementById("particles");
+    document.getElementById(
+      "particles"
+    );
+
 
   const ctx =
-    canvas.getContext("2d");
+    canvas.getContext(
+      "2d"
+    );
+
 
   let particles = [];
 
+
   let width;
+
   let height;
+
 
   function resize() {
 
@@ -450,22 +786,28 @@ function initParticles() {
       canvas.width =
       window.innerWidth;
 
+
     height =
       canvas.height =
       window.innerHeight;
+
   }
 
+
   resize();
+
 
   window.addEventListener(
     "resize",
     resize
   );
 
+
   const COUNT =
     prefersReducedMotion
       ? 0
       : 26;
+
 
   for (
     let i = 0;
@@ -475,22 +817,38 @@ function initParticles() {
 
     particles.push({
 
-      x: Math.random() * width,
+      x:
+        Math.random() *
+        width,
 
-      y: Math.random() * height,
+      y:
+        Math.random() *
+        height,
 
-      r: Math.random() * 1.6 + 0.4,
+      r:
+        Math.random() *
+        1.6 +
+        0.4,
 
       speed:
-        Math.random() * 0.25 + 0.05,
+        Math.random() *
+        0.25 +
+        0.05,
 
       drift:
-        Math.random() * 0.4 - 0.2,
+        Math.random() *
+        0.4 -
+        0.2,
 
       alpha:
-        Math.random() * 0.5 + 0.15,
+        Math.random() *
+        0.5 +
+        0.15
+
     });
+
   }
+
 
   function tick() {
 
@@ -501,15 +859,21 @@ function initParticles() {
       height
     );
 
+
     ctx.fillStyle =
       "#f3d9ce";
 
-    for (const p of particles) {
+
+    for (
+      const p of particles
+    ) {
 
       ctx.globalAlpha =
         p.alpha;
 
+
       ctx.beginPath();
+
 
       ctx.arc(
         p.x,
@@ -519,113 +883,174 @@ function initParticles() {
         Math.PI * 2
       );
 
+
       ctx.fill();
 
-      p.y -= p.speed;
+
+      p.y -=
+        p.speed;
+
 
       p.x +=
-        p.drift * 0.2;
+        p.drift *
+        0.2;
 
-      if (p.y < -5) {
+
+      if (
+        p.y < -5
+      ) {
 
         p.y =
           height + 5;
 
+
         p.x =
-          Math.random() * width;
+          Math.random() *
+          width;
+
       }
+
     }
 
-    requestAnimationFrame(tick);
+
+    requestAnimationFrame(
+      tick
+    );
+
   }
 
-  if (!prefersReducedMotion) {
+
+  if (
+    !prefersReducedMotion
+  ) {
+
     tick();
+
   }
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // CONFETTI
-// ------------------------------------------------------------
+// ============================================================
 
 function launchConfetti() {
 
   const canvas =
-    document.getElementById("confetti");
+    document.getElementById(
+      "confetti"
+    );
+
 
   const ctx =
-    canvas.getContext("2d");
+    canvas.getContext(
+      "2d"
+    );
+
 
   const width =
-    (canvas.width =
-      window.innerWidth);
+    (
+      canvas.width =
+      window.innerWidth
+    );
+
 
   const height =
-    (canvas.height =
-      window.innerHeight);
+    (
+      canvas.height =
+      window.innerHeight
+    );
+
 
   const colors = [
+
     "#e3a75c",
+
     "#f0c98d",
+
     "#d99a95",
+
     "#f6ece2"
+
   ];
+
 
   const COUNT =
     prefersReducedMotion
       ? 0
       : 90;
 
+
   const pieces =
     Array.from(
-      { length: COUNT },
+      {
+        length: COUNT
+      },
       () => ({
 
         x:
-          Math.random() * width,
+          Math.random() *
+          width,
 
         y:
           -20 -
           Math.random() *
-            height *
-            0.5,
+          height *
+          0.5,
 
         w:
-          Math.random() * 8 + 4,
+          Math.random() *
+          8 +
+          4,
 
         h:
-          Math.random() * 12 + 6,
+          Math.random() *
+          12 +
+          6,
 
         color:
           colors[
             Math.floor(
               Math.random() *
-                colors.length
+              colors.length
             )
           ],
 
         speed:
-          Math.random() * 2 + 1.5,
+          Math.random() *
+          2 +
+          1.5,
 
         drift:
-          Math.random() * 1.4 - 0.7,
+          Math.random() *
+          1.4 -
+          0.7,
 
         rotation:
-          Math.random() * 360,
+          Math.random() *
+          360,
 
         spin:
-          Math.random() * 4 - 2,
+          Math.random() *
+          4 -
+          2
+
       })
     );
 
+
   let frame = 0;
+
 
   const MAX_FRAMES =
     60 * 6;
 
+
   function tick() {
 
     frame++;
+
 
     ctx.clearRect(
       0,
@@ -634,26 +1059,35 @@ function launchConfetti() {
       height
     );
 
-    for (const p of pieces) {
+
+    for (
+      const p of pieces
+    ) {
 
       ctx.save();
+
 
       ctx.translate(
         p.x,
         p.y
       );
 
+
       ctx.rotate(
-        (p.rotation *
-          Math.PI) /
-          180
+        (
+          p.rotation *
+          Math.PI
+        ) / 180
       );
+
 
       ctx.fillStyle =
         p.color;
 
+
       ctx.globalAlpha =
         0.9;
+
 
       ctx.fillRect(
         -p.w / 2,
@@ -662,20 +1096,38 @@ function launchConfetti() {
         p.h
       );
 
+
       ctx.restore();
 
-      p.y += p.speed;
 
-      p.x += p.drift;
+      p.y +=
+        p.speed;
 
-      p.rotation += p.spin;
 
-      if (p.y > height + 20) {
+      p.x +=
+        p.drift;
+
+
+      p.rotation +=
+        p.spin;
+
+
+      if (
+        p.y >
+        height + 20
+      ) {
+
         p.y = -20;
+
       }
+
     }
 
-    if (frame < MAX_FRAMES) {
+
+    if (
+      frame <
+      MAX_FRAMES
+    ) {
 
       requestAnimationFrame(
         tick
@@ -689,36 +1141,57 @@ function launchConfetti() {
         width,
         height
       );
+
     }
+
   }
 
-  if (!prefersReducedMotion) {
+
+  if (
+    !prefersReducedMotion
+  ) {
+
     tick();
+
   }
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // FLOATING SYMBOLS
-// ------------------------------------------------------------
+// ============================================================
 
 function launchFloatingSymbols() {
 
-  if (prefersReducedMotion) {
+  if (
+    prefersReducedMotion
+  ) {
+
     return;
+
   }
+
 
   const container =
     document.getElementById(
       "floatingSymbols"
     );
 
+
   const symbols = [
+
     "\u2764",
+
     "\u2728",
+
     "\u2764"
+
   ];
 
+
   const COUNT = 14;
+
 
   for (
     let i = 0;
@@ -726,51 +1199,66 @@ function launchFloatingSymbols() {
     i++
   ) {
 
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      const el =
-        document.createElement(
-          "span"
+        const el =
+          document.createElement(
+            "span"
+          );
+
+
+        el.className =
+          "floating-symbol";
+
+
+        el.textContent =
+          symbols[
+            Math.floor(
+              Math.random() *
+              symbols.length
+            )
+          ];
+
+
+        el.style.left =
+          `${Math.random() * 100}%`;
+
+
+        el.style.animationDuration =
+          `${6 + Math.random() * 4}s`;
+
+
+        container.appendChild(
+          el
         );
 
-      el.className =
-        "floating-symbol";
 
-      el.textContent =
-        symbols[
-          Math.floor(
-            Math.random() *
-              symbols.length
-          )
-        ];
+        setTimeout(
+          () => el.remove(),
+          11000
+        );
 
-      el.style.left =
-        `${Math.random() * 100}%`;
+      },
+      i * 350
+    );
 
-      el.style.animationDuration =
-        `${6 + Math.random() * 4}s`;
-
-      container.appendChild(el);
-
-      setTimeout(
-        () => el.remove(),
-        11000
-      );
-
-    }, i * 350);
   }
+
 }
 
-// ------------------------------------------------------------
+
+// ============================================================
 // INIT
-// ------------------------------------------------------------
+// ============================================================
 
 initParticles();
 
 initLoading();
 
+
 // ============================================================
-// START MUSIC IMMEDIATELY WHEN WEBSITE OPENS
+// MUSIC
 // ============================================================
 
 startMusic();
