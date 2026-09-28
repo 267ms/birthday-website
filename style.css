@@ -327,7 +327,6 @@ button {
    3. PHOTO SLIDESHOW
    ===================================================== */
 .slideshow {
-   opacity: 0;
   width: min(94vw, 480px);
   display: flex;
   flex-direction: column;
