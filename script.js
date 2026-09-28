@@ -33,12 +33,12 @@ Happy Birthday. I hope today feels exactly like you deserve.`;
 // ============================================================
 
 const photos = [
-  "images/photo1.jpg",
-  "images/photo2.jpg",
-  "images/photo3.jpg",
-  "images/photo4.jpg",
-  "images/photo5.jpg",
-  "images/photo6.jpg"
+  "images/image1.jpg",
+  "images/image2.jpg",
+  "images/image3.jpg",
+  "images/image4.jpg",
+  "images/image5.jpg",
+  "images/image6.jpg"
 ];
 
 // ============================================================
