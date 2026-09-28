@@ -242,16 +242,13 @@ document
     "click",
     async () => {
 
-      // Start music after user interaction.
-      startMusic();
-
 
       // IMPORTANT:
       // Load all photos before showing slideshow.
       // This prevents blank/white photo screens.
       await preloadPhotos();
 
-
+screens.slideshow.classList.add("is-ready");
       // Now open slideshow.
       await showScreen(
         screens.card,
