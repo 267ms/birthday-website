@@ -5,14 +5,14 @@
 // ============================================================
 
 // The name that appears on the birthday card.
-const birthdayName = "Your Friend Name";
+const birthdayName = "Sneha";
 
 // The short line that types itself out under the name on the card.
 const cardGreeting = "I made you something small, just for today.";
 
 // How long each photo stays on screen, in milliseconds.
 // 1000 = 1 second.
-const PHOTO_DURATION = 300;
+const PHOTO_DURATION = 500;
 
 // How long the fade/slide between photos takes, in milliseconds.
 // Keep this shorter than PHOTO_DURATION.
@@ -39,20 +39,7 @@ const photos = [
   "images/photo4.jpg",
   "images/photo5.jpg",
   "images/photo6.jpg",
-  "images/photo7.jpg",
-  "images/photo8.jpg",
-  "images/photo9.jpg",
-  "images/photo10.jpg",
-  "images/photo11.jpg",
-  "images/photo12.jpg",
-  "images/photo13.jpg",
-  "images/photo14.jpg",
-  "images/photo15.jpg",
-  "images/photo16.jpg",
-  "images/photo17.jpg",
-  "images/photo18.jpg",
-  "images/photo19.jpg",
-  "images/photo20.jpg"
+  "images/photo7.jpg"
 ];
 
 // ============================================================
