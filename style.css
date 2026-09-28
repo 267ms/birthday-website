@@ -327,6 +327,7 @@ button {
    3. PHOTO SLIDESHOW
    ===================================================== */
 .slideshow {
+   opacity: 0;
   width: min(94vw, 480px);
   display: flex;
   flex-direction: column;
@@ -334,6 +335,9 @@ button {
   gap: 1.4rem;
 }
 
+.slideshow.is-ready{
+   opacity: 1;
+}
 .photo-stage {
   position: relative;
   width: 100%;
