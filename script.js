@@ -247,8 +247,7 @@ document
       // Load all photos before showing slideshow.
       // This prevents blank/white photo screens.
       await preloadPhotos();
-
-screens.slideshow.classList.add("is-ready");
+  documents.querySelector(".slideshow").classList.add("is-ready");
       // Now open slideshow.
       await showScreen(
         screens.card,
